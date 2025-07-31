@@ -10,6 +10,7 @@ class ImageRepository
     public function createNewImagesFromUrls(array $urls): void
     {
         $existingImages = $this->getImagesByUrls($urls);
+        $newImages = [];
 
         foreach ($urls as $url) {
             if (!isset($existingImages[$url])) {

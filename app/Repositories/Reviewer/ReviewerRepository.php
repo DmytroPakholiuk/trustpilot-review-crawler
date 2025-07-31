@@ -6,9 +6,9 @@ use App\Models\Reviewer;
 
 class ReviewerRepository
 {
-    public function createNewReviewers(array $data)
+    public function upsertReviewers(array $data): void
     {
-
+        Reviewer::query()->upsert($data, ['username'], ['image_id', 'reviews_count', 'country']);
     }
 
     public function getReviewersByUsernames(array $usernames)

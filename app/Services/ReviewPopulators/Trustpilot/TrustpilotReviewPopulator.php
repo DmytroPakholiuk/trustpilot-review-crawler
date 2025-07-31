@@ -31,6 +31,12 @@ class TrustpilotReviewPopulator implements ReviewPopulator
 
     public function populateReviews()
     {
+        /**
+         * @var bool $quickSearch - if enabled, will stop populating as soon as reviews stop being changed.
+         * It is good to quickly checking for new reviews, but will not record changes in profiles and
+         * profile pictures of older reviewers.
+         */
+        $quickSearch = Config::get("review_populator.trustpilot.quickSearch");
         $urls = Config::get("review_populator.trustpilot.urls");
         if (!$urls) {
             throw new \Exception("No TrustPilot URLs specified in configs");
@@ -44,9 +50,19 @@ class TrustpilotReviewPopulator implements ReviewPopulator
             foreach ($this->crawler->getReviewBodiesByPage($url) as $cardCollection) {
                 $imageUrls = $this->imageParser->getImages($cardCollection);
                 $this->imageRepository->createNewImagesFromUrls($imageUrls);
-                $images = $this->imageRepository->getImagesByUrls($imageUrls);
+                $imageMap = $this->imageRepository->getImagesByUrls($imageUrls);
 
-                dd($images);
+                $reviewerData = $this->reviewerParser->getReviewersData($cardCollection, $imageMap);
+                $this->reviewerRepository->upsertReviewers($reviewerData);
+                $usernames = $this->reviewerParser->getUsernames($cardCollection);
+                $usernameMap = $this->reviewerRepository->getReviewersByUsernames($usernames);
+
+                $reviewData = $this->reviewParser->getReviewsData($cardCollection, $usernameMap, $subject);
+                $newReviewsCount = $this->reviewRepository->insertNewReviews($reviewData);
+
+                if ($quickSearch && !$newReviewsCount) {
+                    break;
+                }
             }
         }
     }

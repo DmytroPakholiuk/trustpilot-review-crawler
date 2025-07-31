@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('reviews', function (Blueprint $table) {
             $table->id();
             $table->string('title')->index();
-            $table->integer('rating');
-            $table->text('content');
+            $table->float('rating');
+            $table->text('content')->nullable();
             $table->foreignId('reviewer_id')->references('id')->on('reviewers');
             $table->foreignId('review_subject_id')->references('id')->on('review_subjects');
             $table->date('review_date');

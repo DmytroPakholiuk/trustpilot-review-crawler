@@ -21,9 +21,9 @@ abstract class BaseIdentifier
         return $matches[0];
     }
 
-    public function getFirstSubMatch(string $string): string
+    public function getFirstSubMatch(string $string): ?string
     {
-        return $this->getSubMatches($string)[0];
+        return $this->getSubMatches($string) ? $this->getSubMatches($string)[0] : null;
     }
 
     public function getSubMatches(string $string): array

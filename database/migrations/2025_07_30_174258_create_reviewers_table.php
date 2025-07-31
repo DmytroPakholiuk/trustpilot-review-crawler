@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('reviewers', function (Blueprint $table) {
             $table->id();
-            $table->string('username')->index();
+            $table->string('username')->unique();
             $table->foreignId('image_id')->nullable()->references('id')->on('images');
             $table->string('reviews_count')->default(0);
             $table->string('country')->index();
