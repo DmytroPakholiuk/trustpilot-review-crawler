@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Services\ImageDownloader\ImageDownloader;
 use App\Services\ReviewPopulators\ReviewPopulator;
 use Illuminate\Console\Command;
 
@@ -28,5 +29,9 @@ class ScrapeReviews extends Command
     {
         $populator = app()->get(ReviewPopulator::class);
         $populator->populateReviews();
+//
+//        $imageDownloader = app()->get(ImageDownloader::class);
+//        $imageDownloader->fixMissingFiles();
+//        $imageDownloader->downloadNewImages();
     }
 }
