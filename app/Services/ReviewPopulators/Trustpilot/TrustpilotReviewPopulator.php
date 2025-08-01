@@ -12,6 +12,7 @@ use App\Services\ReviewPopulators\Trustpilot\Parsers\ImageParser;
 use App\Services\ReviewPopulators\Trustpilot\Parsers\ReviewerParser;
 use App\Services\ReviewPopulators\Trustpilot\Parsers\ReviewParser;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Log;
 
 class TrustpilotReviewPopulator implements ReviewPopulator
 {
@@ -33,7 +34,7 @@ class TrustpilotReviewPopulator implements ReviewPopulator
     {
         /**
          * @var bool $quickSearch - if enabled, will stop populating as soon as reviews stop being changed.
-         * It is good to quickly checking for new reviews, but will not record changes in profiles and
+         * It is good for quickly checking for new reviews, but will not record changes in profiles and
          * profile pictures of older reviewers.
          */
         $quickSearch = Config::get("review_populator.trustpilot.quick_search");
@@ -61,7 +62,7 @@ class TrustpilotReviewPopulator implements ReviewPopulator
                 $newReviewsCount = $this->reviewRepository->insertNewReviews($reviewData);
 
                 if ($quickSearch && !$newReviewsCount) {
-                    echo "New reviews checked. Skipping the older reviews\n";
+                    Log::channel('file_and_consoleif')->info("New reviews checked. Skipping the older reviews");
                     break;
                 }
             }

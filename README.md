@@ -27,4 +27,8 @@ There are 3 things to configure: URL list, ALL_LANGUAGES and QUICK_SEARCH
 
 ## Images
 
-Images are stored in storage/app/private/images. Each image is in its own directory, named as its ID in database.
+Images are stored in storage/app/private/images . Each image is in its own directory, named as its ID in database.
+
+## Logging
+
+Logs are recorded to storage/logs/laravel.log . Also, if the code is executed through CLI, it will output execution logs there too.

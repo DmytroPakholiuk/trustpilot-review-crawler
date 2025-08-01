@@ -5,6 +5,8 @@ use Monolog\Handler\StreamHandler;
 use Monolog\Handler\SyslogUdpHandler;
 use Monolog\Processor\PsrLogMessageProcessor;
 
+$isConsole = app()->runningInConsole();
+
 return [
 
     /*
@@ -103,6 +105,21 @@ return [
             ],
             'formatter' => env('LOG_STDERR_FORMATTER'),
             'processors' => [PsrLogMessageProcessor::class],
+        ],
+
+        'stdout' => [
+            'driver' => 'monolog',
+            'handler' => StreamHandler::class,
+            'with' => [
+                'stream' => 'php://stdout',
+            ],
+            'level' => 'info',
+        ],
+
+        'file_and_consoleif' => [
+            'driver' => 'stack',
+            'channels' => $isConsole ? ['single', 'stdout'] : ['single'],
+            'ignore_exceptions' => false,
         ],
 
         'syslog' => [

@@ -6,7 +6,6 @@ use App\Repositories\Image\ImageRepository;
 use GuzzleHttp\Client;
 use GuzzleHttp\Pool;
 use GuzzleHttp\Psr7\Request;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
 
@@ -33,19 +32,27 @@ class ImageDownloader
         });
     }
 
-    protected function downloadImages(iterable $images, int $concurrency = 20)
+    /**
+     * This method downloads images concurrently
+     * @param iterable $images
+     * @param int $concurrency
+     * @return void
+     */
+    protected function downloadImages(iterable $images, int $concurrency = 20): void
     {
         $client = new Client();
-        $requests = function ($images) {
-            foreach ($images as $image) {
-                yield new Request('GET', $image->external_url);
-            }
-        };
+        // We create all the requests we are about to send
+        $requests = [];
+        foreach ($images as $image) {
+            $requests[] = new Request('GET', $image->external_url);
+        }
+        Log::channel('file_and_consoleif')->info("Downloading " . count($requests) . " images");
 
         $saved = 0;
         $errors = [];
 
-        $pool = new Pool($client, $requests($images), [
+        // concurrently executes requests, callbacks execute on per-result basis
+        $pool = new Pool($client, $requests, [
             'concurrency' => $concurrency,
             'fulfilled' => function ($response, $index) use ($images, &$saved) {
                 $image = $images[$index];
@@ -71,6 +78,4 @@ class ImageDownloader
             'errors' => $errors,
         ]);
     }
-
-
 }

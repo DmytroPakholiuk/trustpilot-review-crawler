@@ -4,10 +4,10 @@ namespace App\Services\ReviewPopulators\Trustpilot\Crawlers;
 
 use App\Services\ReviewPopulators\Trustpilot\Identifiers\ReviewCardIdentifier;
 use GuzzleHttp\Client;
-use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Pool;
 use GuzzleHttp\Psr7\Request;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Log;
 
 class TrustpilotPageCrawler
 {
@@ -18,7 +18,7 @@ class TrustpilotPageCrawler
 
     }
 
-    public function getReviewBodiesByPage($url)
+    public function getReviewBodiesByPage($url): \Generator
     {
         $pageNumber = 1;
         $pagesPerRun = 5;
@@ -26,9 +26,10 @@ class TrustpilotPageCrawler
             "$url?languages=all&" : "$url?";
         $errors = [];
 
+        // as soon as we reach a 404 page, an error will be recorded
         while(!$errors) {
             $reviewCards = [];
-            echo "Processing {$urlTemplate} , pages: " . $pageNumber . "-" . $pageNumber + $pagesPerRun - 1 . " \n";
+            Log::channel('file_and_consoleif')->info("Processing {$urlTemplate} , pages: " . $pageNumber . "-" . $pageNumber + $pagesPerRun - 1);
             $responses = $this->crawlPages($urlTemplate, $pageNumber, $pagesPerRun);
             $errors = $responses['errors'];
 
@@ -41,7 +42,15 @@ class TrustpilotPageCrawler
         }
     }
 
-    protected function crawlPages($urlTemplate, $firstPage = 1, $limit = 5, $concurrency = 5): array
+    /**
+     * This method concurrently checks the pages for content
+     * @param $urlTemplate
+     * @param int $firstPage
+     * @param int $limit
+     * @param int $concurrency
+     * @return array[]
+     */
+    protected function crawlPages($urlTemplate, int $firstPage = 1, int $limit = 5, int $concurrency = 5): array
     {
         $client = new Client();
         $requests = [];
@@ -56,10 +65,11 @@ class TrustpilotPageCrawler
         $pool = new Pool($client, $requests, [
             'concurrency' => $concurrency,
             'fulfilled' => function ($response, $index) use ($firstPage, $urlTemplate, &$bodies) {
-                echo "Processing {$urlTemplate}page=" . $firstPage + $index . "\n";
+                Log::channel('file_and_consoleif')->info("Processing {$urlTemplate}page=" . $firstPage + $index);
                 $bodies[] = $response->getBody()->getContents();
             },
             'rejected' => function ($reason, $index) use ($firstPage, $urlTemplate, &$errors) {
+                Log::channel('file_and_consoleif')->info("Page " . $firstPage + $index . " has no reviews");
                 $errors[] = [
                     'url' => $urlTemplate . "page=" . $firstPage + $index,
                     'error' => $reason->getMessage(),

@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Services\ImageDownloader\ImageDownloader;
 use App\Services\ReviewPopulators\ReviewPopulator;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Log;
 
 class ScrapeReviews extends Command
 {
@@ -27,18 +28,18 @@ class ScrapeReviews extends Command
      */
     public function handle()
     {
-        echo "Starting the population process...\n";
+        Log::channel('file_and_consoleif')->info("Starting the population process...\n");
         $populator = app()->get(ReviewPopulator::class);
         $populator->populateReviews();
-        echo "Population process finished\n";
+        Log::channel('file_and_consoleif')->info("Population process finished\n");
 
         $imageDownloader = app()->get(ImageDownloader::class);
-        echo "Fixing missing files...\n";
+        Log::channel('file_and_consoleif')->info("Fixing missing files...\n");
         $imageDownloader->fixMissingFiles();
-        echo "Missing files fixed\n";
+        Log::channel('file_and_consoleif')->info("Missing files fixed\n");
 
-        echo "Downloading new images...\n";
+        Log::channel('file_and_consoleif')->info("Downloading new images...\n");
         $imageDownloader->downloadNewImages();
-        echo "New images downloaded\n";
+        Log::channel('file_and_consoleif')->info("New images downloaded\n");
     }
 }
