@@ -16,6 +16,7 @@ Steps to install:
 - run composer install
 - cp .env.example .env
 - copy database.sqlite from the root of the projet to "database" direcory or run "php artisan migrate"
+- copy "images" directory to storage/app/private/images (optional, gets autofixed on command run)
 
 ## Configuration
 
@@ -32,6 +33,7 @@ Execute php artisan app:scrape-reviews
 ## Images
 
 Images are stored in storage/app/private/images . Each image is in its own directory, named as its ID in database.
+The "images" directory in the root of the project is just a COPY of the results of running the command. 
 
 ## Logging
 
