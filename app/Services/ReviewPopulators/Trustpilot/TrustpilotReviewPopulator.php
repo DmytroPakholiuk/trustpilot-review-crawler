@@ -36,7 +36,7 @@ class TrustpilotReviewPopulator implements ReviewPopulator
          * It is good to quickly checking for new reviews, but will not record changes in profiles and
          * profile pictures of older reviewers.
          */
-        $quickSearch = Config::get("review_populator.trustpilot.quickSearch");
+        $quickSearch = Config::get("review_populator.trustpilot.quick_search");
         $urls = Config::get("review_populator.trustpilot.urls");
         if (!$urls) {
             throw new \Exception("No TrustPilot URLs specified in configs");
@@ -61,6 +61,7 @@ class TrustpilotReviewPopulator implements ReviewPopulator
                 $newReviewsCount = $this->reviewRepository->insertNewReviews($reviewData);
 
                 if ($quickSearch && !$newReviewsCount) {
+                    echo "New reviews checked. Skipping the older reviews\n";
                     break;
                 }
             }

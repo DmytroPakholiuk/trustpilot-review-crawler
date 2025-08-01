@@ -20,17 +20,17 @@ class ReviewRepository
         // retrieving hashes of older reviews with the same content. We collect them as array keys
         // to simplify the search later
         $existingReviews = Review::query()
-            ->whereIn('content', array_column($data, 'content'))
+            ->whereIn('title', array_column($data, 'title'))
             ->whereIn('reviewer_id', array_column($data, 'reviewer_id'))
             ->get();
         $existingHashes = $existingReviews->mapWithKeys(function ($review) {
-            return [md5($review->reviewer_id . '|' . $review->content) => true];
+            return [md5($review->reviewer_id . '|' . $review->title) => true];
         })->toArray();
 
-        foreach ($data as $review) {
-            $hash = md5($review['reviewer_id'] . '|' . $review['content']);
+        foreach ($data as $reviewRow) {
+            $hash = md5($reviewRow['reviewer_id'] . '|' . $reviewRow['title']);
             if (!isset($existingHashes[$hash])) {
-                $finalReviews[] = $review + [
+                $finalReviews[] = $reviewRow + [
                         'created_at' => now(),
                         'updated_at' => now(),
                     ];

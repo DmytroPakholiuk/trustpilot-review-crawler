@@ -8,6 +8,7 @@ use GuzzleHttp\Pool;
 use GuzzleHttp\Psr7\Request;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 
 class ImageDownloader
 {
@@ -65,10 +66,10 @@ class ImageDownloader
         $promise = $pool->promise();
         $promise->wait();
 
-        return [
+        Log::debug("Results of image download", [
             'saved' => $saved,
             'errors' => $errors,
-        ];
+        ]);
     }
 
 

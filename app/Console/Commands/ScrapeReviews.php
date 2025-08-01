@@ -27,11 +27,18 @@ class ScrapeReviews extends Command
      */
     public function handle()
     {
+        echo "Starting the population process...\n";
         $populator = app()->get(ReviewPopulator::class);
         $populator->populateReviews();
-//
-//        $imageDownloader = app()->get(ImageDownloader::class);
-//        $imageDownloader->fixMissingFiles();
-//        $imageDownloader->downloadNewImages();
+        echo "Population process finished\n";
+
+        $imageDownloader = app()->get(ImageDownloader::class);
+        echo "Fixing missing files...\n";
+        $imageDownloader->fixMissingFiles();
+        echo "Missing files fixed\n";
+
+        echo "Downloading new images...\n";
+        $imageDownloader->downloadNewImages();
+        echo "New images downloaded\n";
     }
 }
