@@ -25,6 +25,10 @@ There are 3 things to configure: URL list, ALL_LANGUAGES and QUICK_SEARCH
 - ALL_LANGUAGES in .env file (default FALSE) defines whether it will add "?languages=all" to the URLs, pulling many more reviews
 - QUICK_SEARCH in .env file (default TRUE) defines whether the program will stop scanning product page after the new reviews have been depleted. Good to speed up recurrent checks for new reviews, but will not check the older reviews for avatar and profile changes
 
+## Running
+
+Execute php artisan app:scrape-reviews
+
 ## Images
 
 Images are stored in storage/app/private/images . Each image is in its own directory, named as its ID in database.
